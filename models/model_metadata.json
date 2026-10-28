@@ -1,0 +1,551 @@
+{
+  "active_model_name": "Gradient Boosting Regressor",
+  "active_model_type": "GradientBoosting",
+  "trained_at": "2026-10-09T16:08:12.130536",
+  "dataset_name": "kc_house_data.csv",
+  "dataset_path": "C:\\Users\\DELL\\OneDrive\\Desktop\\Python Projects\\Project1\\data\\kc_house_data.csv",
+  "dataset_total_rows": 197,
+  "train_samples": 157,
+  "test_samples": 40,
+  "features_used": [
+    "sqft_living",
+    "sqft_lot",
+    "bedrooms",
+    "bathrooms",
+    "floors",
+    "waterfront",
+    "view",
+    "condition",
+    "grade",
+    "sqft_above",
+    "sqft_basement",
+    "yr_built",
+    "zipcode"
+  ],
+  "numerical_features": [
+    "sqft_living",
+    "sqft_lot",
+    "bedrooms",
+    "bathrooms",
+    "floors",
+    "waterfront",
+    "view",
+    "condition",
+    "grade",
+    "sqft_above",
+    "sqft_basement",
+    "yr_built"
+  ],
+  "categorical_features": [
+    "zipcode"
+  ],
+  "metrics": {
+    "mae": 73377.55,
+    "mse": 11188044525.94,
+    "rmse": 105773.55,
+    "r2": 0.886,
+    "mape": 16.07
+  },
+  "model_comparisons": [
+    {
+      "name": "Linear Regression (Baseline)",
+      "short_name": "LinearRegression",
+      "r2": -0.4265,
+      "mae": 160086.9,
+      "rmse": 374182.22,
+      "mse": 140012335670.1,
+      "mape": 26.09,
+      "is_best": false
+    },
+    {
+      "name": "Random Forest Regressor",
+      "short_name": "RandomForest",
+      "r2": 0.875,
+      "mae": 77161.79,
+      "rmse": 110771.71,
+      "mse": 12270372412.91,
+      "mape": 18.03,
+      "is_best": false
+    },
+    {
+      "name": "Gradient Boosting Regressor",
+      "short_name": "GradientBoosting",
+      "r2": 0.886,
+      "mae": 73377.55,
+      "rmse": 105773.55,
+      "mse": 11188044525.94,
+      "mape": 16.07,
+      "is_best": true
+    }
+  ],
+  "feature_importance": [
+    {
+      "feature": "sqft_living",
+      "raw_feature": "sqft_living",
+      "importance": 37.11,
+      "technique": "Native Gini / Variance Reduction Importance"
+    },
+    {
+      "feature": "sqft_lot",
+      "raw_feature": "sqft_lot",
+      "importance": 15.17,
+      "technique": "Native Gini / Variance Reduction Importance"
+    },
+    {
+      "feature": "grade",
+      "raw_feature": "grade",
+      "importance": 11.38,
+      "technique": "Native Gini / Variance Reduction Importance"
+    },
+    {
+      "feature": "yr_built",
+      "raw_feature": "yr_built",
+      "importance": 8.63,
+      "technique": "Native Gini / Variance Reduction Importance"
+    },
+    {
+      "feature": "Zip 98004",
+      "raw_feature": "zipcode_98004",
+      "importance": 5.28,
+      "technique": "Native Gini / Variance Reduction Importance"
+    },
+    {
+      "feature": "Zip 98040",
+      "raw_feature": "zipcode_98040",
+      "importance": 4.5,
+      "technique": "Native Gini / Variance Reduction Importance"
+    },
+    {
+      "feature": "Zip 98065",
+      "raw_feature": "zipcode_98065",
+      "importance": 4.3,
+      "technique": "Native Gini / Variance Reduction Importance"
+    },
+    {
+      "feature": "bathrooms",
+      "raw_feature": "bathrooms",
+      "importance": 3.1,
+      "technique": "Native Gini / Variance Reduction Importance"
+    },
+    {
+      "feature": "view",
+      "raw_feature": "view",
+      "importance": 3.01,
+      "technique": "Native Gini / Variance Reduction Importance"
+    },
+    {
+      "feature": "sqft_above",
+      "raw_feature": "sqft_above",
+      "importance": 1.94,
+      "technique": "Native Gini / Variance Reduction Importance"
+    },
+    {
+      "feature": "sqft_basement",
+      "raw_feature": "sqft_basement",
+      "importance": 1.48,
+      "technique": "Native Gini / Variance Reduction Importance"
+    },
+    {
+      "feature": "bedrooms",
+      "raw_feature": "bedrooms",
+      "importance": 0.65,
+      "technique": "Native Gini / Variance Reduction Importance"
+    }
+  ],
+  "residual_summary": {
+    "histogram": [
+      {
+        "bin_label": "$-343k to $-288k",
+        "bin_start": -343739.0,
+        "bin_end": -288578.0,
+        "count": 1
+      },
+      {
+        "bin_label": "$-288k to $-233k",
+        "bin_start": -288578.0,
+        "bin_end": -233418.0,
+        "count": 1
+      },
+      {
+        "bin_label": "$-233k to $-178k",
+        "bin_start": -233418.0,
+        "bin_end": -178257.0,
+        "count": 1
+      },
+      {
+        "bin_label": "$-178k to $-123k",
+        "bin_start": -178257.0,
+        "bin_end": -123096.0,
+        "count": 2
+      },
+      {
+        "bin_label": "$-123k to $-67k",
+        "bin_start": -123096.0,
+        "bin_end": -67936.0,
+        "count": 3
+      },
+      {
+        "bin_label": "$-67k to $-12k",
+        "bin_start": -67936.0,
+        "bin_end": -12775.0,
+        "count": 10
+      },
+      {
+        "bin_label": "$-12k to $42k",
+        "bin_start": -12775.0,
+        "bin_end": 42386.0,
+        "count": 12
+      },
+      {
+        "bin_label": "$42k to $97k",
+        "bin_start": 42386.0,
+        "bin_end": 97546.0,
+        "count": 6
+      },
+      {
+        "bin_label": "$97k to $152k",
+        "bin_start": 97546.0,
+        "bin_end": 152707.0,
+        "count": 1
+      },
+      {
+        "bin_label": "$152k to $207k",
+        "bin_start": 152707.0,
+        "bin_end": 207868.0,
+        "count": 3
+      }
+    ],
+    "scatter_sample": [
+      {
+        "actual": 395000.0,
+        "predicted": 387149.0,
+        "error": 7851.0
+      },
+      {
+        "actual": 565000.0,
+        "predicted": 444189.0,
+        "error": 120811.0
+      },
+      {
+        "actual": 395000.0,
+        "predicted": 367083.0,
+        "error": 27917.0
+      },
+      {
+        "actual": 449900.0,
+        "predicted": 543024.0,
+        "error": -93124.0
+      },
+      {
+        "actual": 745000.0,
+        "predicted": 665745.0,
+        "error": 79255.0
+      },
+      {
+        "actual": 538000.0,
+        "predicted": 544235.0,
+        "error": -6235.0
+      },
+      {
+        "actual": 410000.0,
+        "predicted": 445828.0,
+        "error": -35828.0
+      },
+      {
+        "actual": 950000.0,
+        "predicted": 1293739.0,
+        "error": -343739.0
+      },
+      {
+        "actual": 189000.0,
+        "predicted": 342928.0,
+        "error": -153928.0
+      },
+      {
+        "actual": 510000.0,
+        "predicted": 506873.0,
+        "error": 3127.0
+      },
+      {
+        "actual": 550000.0,
+        "predicted": 548598.0,
+        "error": 1402.0
+      },
+      {
+        "actual": 650000.0,
+        "predicted": 886273.0,
+        "error": -236273.0
+      },
+      {
+        "actual": 495000.0,
+        "predicted": 476416.0,
+        "error": 18584.0
+      },
+      {
+        "actual": 700000.0,
+        "predicted": 513082.0,
+        "error": 186918.0
+      },
+      {
+        "actual": 499950.0,
+        "predicted": 552513.0,
+        "error": -52563.0
+      },
+      {
+        "actual": 320000.0,
+        "predicted": 301959.0,
+        "error": 18041.0
+      },
+      {
+        "actual": 455000.0,
+        "predicted": 470861.0,
+        "error": -15861.0
+      },
+      {
+        "actual": 323000.0,
+        "predicted": 395051.0,
+        "error": -72051.0
+      },
+      {
+        "actual": 572000.0,
+        "predicted": 559524.0,
+        "error": 12476.0
+      },
+      {
+        "actual": 1630000.0,
+        "predicted": 1561946.0,
+        "error": 68054.0
+      },
+      {
+        "actual": 670000.0,
+        "predicted": 685103.0,
+        "error": -15103.0
+      },
+      {
+        "actual": 510000.0,
+        "predicted": 487739.0,
+        "error": 22261.0
+      },
+      {
+        "actual": 720000.0,
+        "predicted": 658811.0,
+        "error": 61189.0
+      },
+      {
+        "actual": 750000.0,
+        "predicted": 800243.0,
+        "error": -50243.0
+      },
+      {
+        "actual": 249000.0,
+        "predicted": 292485.0,
+        "error": -43485.0
+      },
+      {
+        "actual": 275000.0,
+        "predicted": 362932.0,
+        "error": -87932.0
+      },
+      {
+        "actual": 695000.0,
+        "predicted": 664409.0,
+        "error": 30591.0
+      },
+      {
+        "actual": 1520000.0,
+        "predicted": 1557848.0,
+        "error": -37848.0
+      },
+      {
+        "actual": 580500.0,
+        "predicted": 525039.0,
+        "error": 55461.0
+      },
+      {
+        "actual": 390000.0,
+        "predicted": 237253.0,
+        "error": 152747.0
+      },
+      {
+        "actual": 475000.0,
+        "predicted": 477776.0,
+        "error": -2776.0
+      },
+      {
+        "actual": 252000.0,
+        "predicted": 273688.0,
+        "error": -21688.0
+      },
+      {
+        "actual": 448000.0,
+        "predicted": 460810.0,
+        "error": -12810.0
+      },
+      {
+        "actual": 329000.0,
+        "predicted": 529354.0,
+        "error": -200354.0
+      },
+      {
+        "actual": 480000.0,
+        "predicted": 422766.0,
+        "error": 57234.0
+      },
+      {
+        "actual": 585000.0,
+        "predicted": 510115.0,
+        "error": 74885.0
+      },
+      {
+        "actual": 1325000.0,
+        "predicted": 1117132.0,
+        "error": 207868.0
+      },
+      {
+        "actual": 230000.0,
+        "predicted": 286128.0,
+        "error": -56128.0
+      },
+      {
+        "actual": 440000.0,
+        "predicted": 415355.0,
+        "error": 24645.0
+      },
+      {
+        "actual": 247000.0,
+        "predicted": 412817.0,
+        "error": -165817.0
+      }
+    ],
+    "stats": {
+      "min_residual": -343738.96,
+      "max_residual": 207867.68,
+      "mean_residual": -11811.76,
+      "std_residual": 105111.97
+    }
+  },
+  "supported_zipcodes": [
+    "98001",
+    "98002",
+    "98003",
+    "98004",
+    "98006",
+    "98007",
+    "98008",
+    "98010",
+    "98014",
+    "98019",
+    "98022",
+    "98023",
+    "98027",
+    "98028",
+    "98029",
+    "98030",
+    "98033",
+    "98034",
+    "98038",
+    "98040",
+    "98042",
+    "98052",
+    "98053",
+    "98055",
+    "98056",
+    "98058",
+    "98059",
+    "98065",
+    "98074",
+    "98092",
+    "98103",
+    "98106",
+    "98107",
+    "98112",
+    "98115",
+    "98116",
+    "98117",
+    "98119",
+    "98125",
+    "98126",
+    "98133",
+    "98136",
+    "98146",
+    "98166",
+    "98168",
+    "98178",
+    "98198",
+    "98199"
+  ],
+  "summary_ranges": {
+    "sqft_living": {
+      "min": 770.0,
+      "max": 5420.0,
+      "median": 1960.0,
+      "mean": 2177.8426395939086
+    },
+    "sqft_lot": {
+      "min": 1245.0,
+      "max": 101930.0,
+      "median": 6012.0,
+      "mean": 7967.213197969543
+    },
+    "bedrooms": {
+      "min": 1.0,
+      "max": 5.0,
+      "median": 3.0,
+      "mean": 3.416243654822335
+    },
+    "bathrooms": {
+      "min": 1.0,
+      "max": 4.5,
+      "median": 2.25,
+      "mean": 2.16751269035533
+    },
+    "floors": {
+      "min": 1.0,
+      "max": 3.0,
+      "median": 1.5,
+      "mean": 1.4898477157360406
+    },
+    "waterfront": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.005076142131979695
+    },
+    "view": {
+      "min": 0.0,
+      "max": 4.0,
+      "median": 0.0,
+      "mean": 0.14213197969543148
+    },
+    "condition": {
+      "min": 3.0,
+      "max": 5.0,
+      "median": 3.0,
+      "mean": 3.416243654822335
+    },
+    "grade": {
+      "min": 6.0,
+      "max": 11.0,
+      "median": 8.0,
+      "mean": 7.888324873096447
+    },
+    "sqft_above": {
+      "min": 770.0,
+      "max": 4580.0,
+      "median": 1570.0,
+      "mean": 1877.6395939086294
+    },
+    "sqft_basement": {
+      "min": 0.0,
+      "max": 1700.0,
+      "median": 0.0,
+      "mean": 300.20304568527916
+    },
+    "yr_built": {
+      "min": 1900.0,
+      "max": 2014.0,
+      "median": 1963.0,
+      "mean": 1968.4111675126903
+    }
+  }
+}

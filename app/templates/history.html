@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction History — HomeValue AI{% endblock %}
+{% block page_title %}Prediction History{% endblock %}
+
+{% block content %}
+<div class="app-card">
+  <div class="app-card-header flex-wrap gap-2">
+    <div>
+      <h2 class="app-card-title"><i class="bi bi-clock-history text-primary"></i> Valuation History Records</h2>
+      <div class="app-card-subtitle">Search, filter, inspect, and export persisted property evaluations</div>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('prediction.api_export_predictions') }}" class="btn btn-sm btn-outline-success" id="exportCsvBtn">
+        <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export to CSV
+      </a>
+      <a href="{{ url_for('prediction.predict_page') }}" class="btn-primary-custom btn-sm">
+        <i class="bi bi-plus-lg me-1"></i> New Valuation
+      </a>
+    </div>
+  </div>
+
+  <!-- Filter & Search Controls -->
+  <div class="p-3 bg-light rounded border mb-4">
+    <div class="row g-2 align-items-center">
+      <!-- Search -->
+      <div class="col-md-3">
+        <label for="historySearch" class="small fw-bold text-muted mb-1">Search Property / Zip</label>
+        <div class="input-group input-group-sm">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input type="text" class="form-control" id="historySearch" placeholder="Search title or zipcode...">
+        </div>
+      </div>
+
+      <!-- Zipcode filter -->
+      <div class="col-md-2">
+        <label for="historyZipcode" class="small fw-bold text-muted mb-1">Zipcode</label>
+        <select class="form-select form-select-sm" id="historyZipcode">
+          <option value="all" selected>All Zipcodes</option>
+          {% for zc in zipcodes %}
+          <option value="{{ zc }}">{{ zc }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Bedrooms filter -->
+      <div class="col-md-2">
+        <label for="historyBedrooms" class="small fw-bold text-muted mb-1">Bedrooms</label>
+        <select class="form-select form-select-sm" id="historyBedrooms">
+          <option value="" selected>Any Bedrooms</option>
+          <option value="1">1 Bedroom</option>
+          <option value="2">2 Bedrooms</option>
+          <option value="3">3 Bedrooms</option>
+          <option value="4">4 Bedrooms</option>
+          <option value="5">5+ Bedrooms</option>
+        </select>
+      </div>
+
+      <!-- Price range filter -->
+      <div class="col-md-3">
+        <label class="small fw-bold text-muted mb-1">Price Range ($)</label>
+        <div class="d-flex gap-1">
+          <input type="number" class="form-control form-control-sm" id="historyMinPrice" placeholder="Min" step="50000">
+          <input type="number" class="form-control form-control-sm" id="historyMaxPrice" placeholder="Max" step="50000">
+        </div>
+      </div>
+
+      <!-- Sort & Filter Actions -->
+      <div class="col-md-2 d-flex align-items-end gap-1">
+        <button type="button" class="btn btn-sm btn-primary w-100" id="applyHistoryFiltersBtn">
+          <i class="bi bi-funnel me-1"></i> Filter
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="resetHistoryFiltersBtn" title="Reset Filters">
+          <i class="bi bi-arrow-counterclockwise"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Records Table -->
+  <div class="table-responsive">
+    <table class="custom-table" id="historyTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Date Recorded</th>
+          <th>Property Title</th>
+          <th>Location</th>
+          <th>Living Space</th>
+          <th>Beds / Baths</th>
+          <th>Estimated Price</th>
+          <th>Defensible Range</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="historyTableBody">
+        <tr>
+          <td colspan="9" class="text-center py-4">
+            <div class="spinner-border spinner-border-sm text-primary me-2"></div> Loading records...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top flex-wrap gap-2">
+    <div class="small text-muted" id="paginationInfo">Showing 0 of 0 records</div>
+    <nav>
+      <ul class="pagination pagination-sm mb-0" id="paginationList">
+        <!-- Injected via JavaScript -->
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<!-- History Detail Modal -->
+<div class="modal fade" id="historyDetailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title"><i class="bi bi-card-checklist me-2"></i> Valuation Record Inspection</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4" id="historyDetailBody">
+        <!-- Injected via JS -->
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-outline-danger me-auto" id="deleteFromModalBtn">
+          <i class="bi bi-trash3 me-1"></i> Delete Record
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/history.js') }}"></script>
+{% endblock %}

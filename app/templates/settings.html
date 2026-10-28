@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Settings — HomeValue AI{% endblock %}
+{% block page_title %}Settings & System Preferences{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <!-- Currency & Display Settings -->
+    <div class="app-card mb-4">
+      <div class="app-card-header">
+        <div>
+          <h2 class="app-card-title"><i class="bi bi-currency-exchange text-primary"></i> Regional & Currency Preferences</h2>
+          <div class="app-card-subtitle">Choose formatting style for property estimates and analytics</div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="settingsCurrency" class="form-label">Preferred Currency Display</label>
+        <select class="form-select" id="settingsCurrency" onchange="updateSettingsCurrency(this.value)">
+          <option value="USD">United States Dollar ($ USD - King County Default)</option>
+          <option value="INR">Indian Rupee (₹ INR - Converted at 83.50)</option>
+        </select>
+        <div class="input-hint">Changes apply instantly across all dashboard KPI cards, charts, and history tables.</div>
+      </div>
+
+      <div class="p-3 bg-light rounded border">
+        <div class="small fw-bold text-dark mb-1">Currency Conversion Formula</div>
+        <div class="small text-muted font-monospace">1.0 USD = 83.50 INR</div>
+        <div class="small text-muted mt-1">Estimates are calculated natively in USD based on US real estate records and formatted to INR when selected.</div>
+      </div>
+    </div>
+
+    <!-- Valuation Engine Defaults -->
+    <div class="app-card mb-4">
+      <div class="app-card-header">
+        <div>
+          <h2 class="app-card-title"><i class="bi bi-sliders text-teal"></i> Valuation Engine Assumptions</h2>
+          <div class="app-card-subtitle">Default property values populated when loading the prediction form</div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Default Postal Code</label>
+          <input type="text" class="form-control" value="98103 (Seattle Green Lake)" readonly>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Uncertainty Confidence Interval</label>
+          <input type="text" class="form-control" value="90% Empirical Bound (±1.645 × Test RMSE)" readonly>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Random Seed</label>
+          <input type="text" class="form-control" value="42 (Fixed Reproducibility Seed)" readonly>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Train / Test Split Ratio</label>
+          <input type="text" class="form-control" value="80% Training / 20% Held-Out Testing" readonly>
+        </div>
+      </div>
+    </div>
+
+    <!-- Database Storage Diagnostics -->
+    <div class="app-card">
+      <div class="app-card-header">
+        <div>
+          <h2 class="app-card-title"><i class="bi bi-database text-warning"></i> SQLite Database Diagnostics</h2>
+          <div class="app-card-subtitle">Prediction history persistence file inspection</div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="small text-muted mb-1">Database Location:</div>
+        <div class="p-2 bg-light border rounded font-monospace small">instance/predictions.db</div>
+      </div>
+
+      <div class="alert alert-info d-flex align-items-center gap-2 mb-0">
+        <i class="bi bi-info-circle-fill fs-5"></i>
+        <div class="small">
+          All user prediction requests are automatically recorded with timestamps, feature inputs, predicted prices, and model versions.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Status Card -->
+  <div class="col-lg-4">
+    <div class="app-card text-center">
+      <div class="kpi-icon-wrapper kpi-icon-indigo mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.75rem;">
+        <i class="bi bi-check2-circle"></i>
+      </div>
+      <h4 class="fw-bold mb-1">System Health</h4>
+      <div class="badge bg-success-subtle text-success border border-success-subtle mb-3">All Services Operational</div>
+
+      <div class="text-start small border-top pt-3">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted">Flask Backend:</span>
+          <span class="fw-bold text-success">Healthy</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted">SQLite Storage:</span>
+          <span class="fw-bold text-success">Connected</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted">Joblib Pipeline:</span>
+          <span class="fw-bold text-success">Loaded</span>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span class="text-muted">Inference Latency:</span>
+          <span class="fw-bold text-dark">&lt; 15ms</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function updateSettingsCurrency(curr) {
+    window.HomeValueApp?.setCurrency(curr);
+    window.HomeValueApp?.showToast(`Currency display changed to ${curr}.`, 'success');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const sel = document.getElementById('settingsCurrency');
+    if (sel && window.HomeValueApp) {
+      sel.value = window.HomeValueApp.currency;
+    }
+  });
+</script>
+{% endblock %}

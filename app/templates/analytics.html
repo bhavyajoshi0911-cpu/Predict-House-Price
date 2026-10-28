@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Market Analytics — HomeValue AI{% endblock %}
+{% block page_title %}Market Analytics{% endblock %}
+
+{% block content %}
+<!-- Top Header & Filter Bar -->
+<div class="app-card mb-4">
+  <div class="app-card-header flex-wrap gap-2">
+    <div>
+      <h2 class="app-card-title"><i class="bi bi-graph-up-arrow text-primary"></i> Real Estate Market Intelligence</h2>
+      <div class="app-card-subtitle">Exploratory data analysis derived directly from verified market sales records</div>
+    </div>
+  </div>
+
+  <!-- Interactive Filters -->
+  <div class="p-3 bg-light rounded border">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-3">
+        <label for="analyticsZipcode" class="small fw-bold text-muted mb-1">Filter by Zipcode</label>
+        <select class="form-select form-select-sm" id="analyticsZipcode">
+          <option value="all" selected>All King County Markets</option>
+          {% for zc in zipcodes %}
+          <option value="{{ zc }}">{{ zc }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <label for="analyticsMinBeds" class="small fw-bold text-muted mb-1">Min Bedrooms</label>
+        <select class="form-select form-select-sm" id="analyticsMinBeds">
+          <option value="" selected>Any</option>
+          <option value="1">1+ Bed</option>
+          <option value="2">2+ Beds</option>
+          <option value="3">3+ Beds</option>
+          <option value="4">4+ Beds</option>
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <label for="analyticsMaxBeds" class="small fw-bold text-muted mb-1">Max Bedrooms</label>
+        <select class="form-select form-select-sm" id="analyticsMaxBeds">
+          <option value="" selected>Any</option>
+          <option value="3">Up to 3 Beds</option>
+          <option value="4">Up to 4 Beds</option>
+          <option value="5">Up to 5 Beds</option>
+          <option value="6">6+ Beds</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label class="small fw-bold text-muted mb-1">Price Filter Range ($)</label>
+        <div class="d-flex gap-1">
+          <input type="number" class="form-control form-control-sm" id="analyticsMinPrice" placeholder="Min Price" step="50000">
+          <input type="number" class="form-control form-control-sm" id="analyticsMaxPrice" placeholder="Max Price" step="50000">
+        </div>
+      </div>
+
+      <div class="col-md-2 d-flex align-items-end gap-1">
+        <button type="button" class="btn btn-sm btn-primary w-100" id="applyAnalyticsFilterBtn">
+          <i class="bi bi-funnel me-1"></i> Apply
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="resetAnalyticsFilterBtn" title="Reset">
+          <i class="bi bi-arrow-counterclockwise"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Summary Metrics Strip -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="kpi-card mb-0">
+      <div class="kpi-icon-wrapper kpi-icon-indigo"><i class="bi bi-houses"></i></div>
+      <div>
+        <div class="kpi-label">Sample Size</div>
+        <div class="kpi-value" id="analyticTotalProperties">--</div>
+        <div class="kpi-subtext">Sales matching filters</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="kpi-card mb-0">
+      <div class="kpi-icon-wrapper kpi-icon-teal"><i class="bi bi-currency-dollar"></i></div>
+      <div>
+        <div class="kpi-label">Average Sale Price</div>
+        <div class="kpi-value" id="analyticAvgPrice">--</div>
+        <div class="kpi-subtext" id="analyticMedianPrice">Median: --</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="kpi-card mb-0">
+      <div class="kpi-icon-wrapper kpi-icon-amber"><i class="bi bi-arrows-angle"></i></div>
+      <div>
+        <div class="kpi-label">Average Area</div>
+        <div class="kpi-value" id="analyticAvgSqft">--</div>
+        <div class="kpi-subtext">Square feet interior</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="kpi-card mb-0">
+      <div class="kpi-icon-wrapper kpi-icon-emerald"><i class="bi bi-tag-fill"></i></div>
+      <div>
+        <div class="kpi-label">Price Per Sq Ft</div>
+        <div class="kpi-value" id="analyticAvgPriceSqft">--</div>
+        <div class="kpi-subtext">Market benchmark average</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 6 Interactive Analytics Charts Grid -->
+<div class="row g-4">
+  <!-- Chart 1: Price Distribution -->
+  <div class="col-lg-6">
+    <div class="app-card h-100">
+      <div class="app-card-header">
+        <div>
+          <h3 class="app-card-title"><i class="bi bi-bar-chart-steps text-primary"></i> Sale Price Distribution</h3>
+          <div class="app-card-subtitle">Frequency distribution across property price brackets</div>
+        </div>
+      </div>
+      <div style="height: 300px; position: relative;">
+        <canvas id="marketPriceDistChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 2: Price vs Living Area -->
+  <div class="col-lg-6">
+    <div class="app-card h-100">
+      <div class="app-card-header">
+        <div>
+          <h3 class="app-card-title"><i class="bi bi-scatter-chart text-info"></i> Price vs. Living Area (sq ft)</h3>
+          <div class="app-card-subtitle">Visual correlation showing price scale against living dimensions</div>
+        </div>
+      </div>
+      <div style="height: 300px; position: relative;">
+        <canvas id="marketScatterChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 3: Average Price by Bedrooms -->
+  <div class="col-lg-6">
+    <div class="app-card h-100">
+      <div class="app-card-header">
+        <div>
+          <h3 class="app-card-title"><i class="bi bi-building-fill-check text-success"></i> Price by Bedroom Count</h3>
+          <div class="app-card-subtitle">Mean transaction valuation stratified by bedroom configurations</div>
+        </div>
+      </div>
+      <div style="height: 300px; position: relative;">
+        <canvas id="marketBedroomsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 4: Average Price by Bathrooms -->
+  <div class="col-lg-6">
+    <div class="app-card h-100">
+      <div class="app-card-header">
+        <div>
+          <h3 class="app-card-title"><i class="bi bi-droplet-fill text-teal"></i> Price by Bathroom Count</h3>
+          <div class="app-card-subtitle">Impact of full and partial bathroom counts on property valuations</div>
+        </div>
+      </div>
+      <div style="height: 300px; position: relative;">
+        <canvas id="marketBathroomsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 5: Top Zipcodes Valuation -->
+  <div class="col-lg-6">
+    <div class="app-card h-100">
+      <div class="app-card-header">
+        <div>
+          <h3 class="app-card-title"><i class="bi bi-geo-alt-fill text-danger"></i> High-Volume Zipcode Comparison</h3>
+          <div class="app-card-subtitle">Average property prices in key King County residential micro-markets</div>
+        </div>
+      </div>
+      <div style="height: 300px; position: relative;">
+        <canvas id="marketZipcodesChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 6: Feature Correlation Ranking -->
+  <div class="col-lg-6">
+    <div class="app-card h-100">
+      <div class="app-card-header">
+        <div>
+          <h3 class="app-card-title"><i class="bi bi-pie-chart-fill text-warning"></i> Feature Correlation with Price</h3>
+          <div class="app-card-subtitle">Pearson correlation coefficients ($r$) of property features against price</div>
+        </div>
+      </div>
+      <div style="height: 300px; position: relative;">
+        <canvas id="marketCorrelationChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+{% endblock %}

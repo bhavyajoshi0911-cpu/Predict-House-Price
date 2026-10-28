@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}Model Performance & Evaluation — HomeValue AI{% endblock %}
+{% block page_title %}Model Performance & Evaluation{% endblock %}
+
+{% block content %}
+<!-- Active Model Summary Card -->
+<div class="app-card">
+  <div class="app-card-header flex-wrap gap-2">
+    <div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+          <i class="bi bi-patch-check-fill me-1"></i> Active Production Model
+        </span>
+        <span class="small text-muted" id="lastTrainedText">Last trained: {{ metadata.trained_at or 'Recently' }}</span>
+      </div>
+      <h2 class="app-card-title fs-3 mt-1" id="activeModelTitle">{{ metadata.active_model_name or 'Random Forest Regressor' }}</h2>
+      <div class="app-card-subtitle">
+        Trained on <span class="fw-bold text-dark">{{ metadata.dataset_name or 'kc_house_data.csv' }}</span> 
+        ({{ metadata.dataset_total_rows or '--' }} rows total • Train: {{ metadata.train_samples or '--' }} • Held-out Test: {{ metadata.test_samples or '--' }})
+      </div>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <a href="{{ url_for('dataset.dataset_explorer_page') }}" class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-arrow-repeat me-1"></i> Retrain or Switch Model
+      </a>
+    </div>
+  </div>
+
+  <!-- Metric Badges Strip -->
+  <div class="row g-3 mt-1">
+    <div class="col-sm-6 col-md-3">
+      <div class="p-3 rounded border bg-light">
+        <div class="small fw-bold text-muted text-uppercase">R² Score (Variance Explained)</div>
+        <div class="fs-2 fw-bold text-primary" id="metricR2">{{ metadata.metrics.r2 if metadata.metrics else '--' }}</div>
+        <div class="small text-muted">1.0 = Perfect fit (Higher is better)</div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+      <div class="p-3 rounded border bg-light">
+        <div class="small fw-bold text-muted text-uppercase">Mean Absolute Error (MAE)</div>
+        <div class="fs-2 fw-bold text-success" id="metricMae">
+          {% if metadata.metrics %}${{ "{:,.0f}".format(metadata.metrics.mae) }}{% else %}--{% endif %}
+        </div>
+        <div class="small text-muted">Average error in dollars (Lower is better)</div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+      <div class="p-3 rounded border bg-light">
+        <div class="small fw-bold text-muted text-uppercase">Root Mean Squared Error (RMSE)</div>
+        <div class="fs-2 fw-bold text-info" id="metricRmse">
+          {% if metadata.metrics %}${{ "{:,.0f}".format(metadata.metrics.rmse) }}{% else %}--{% endif %}
+        </div>
+        <div class="small text-muted">Penalizes large errors (Lower is better)</div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+      <div class="p-3 rounded border bg-light">
+        <div class="small fw-bold text-muted text-uppercase">Mean Abs. Percentage Error</div>
+        <div class="fs-2 fw-bold text-warning" id="metricMape">
+          {% if metadata.metrics and metadata.metrics.mape %}{{ metadata.metrics.mape }}%{% else %}--{% endif %}
+        </div>
+        <div class="small text-muted">Average relative deviation (%)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3-Model Comparison Table -->
+<div class="app-card">
+  <div class="app-card-header">
+    <div>
+      <h3 class="app-card-title"><i class="bi bi-trophy-fill text-warning"></i> Model Benchmark Comparison</h3>
+      <div class="app-card-subtitle">All algorithms evaluated on the identical held-out 20% test split to avoid data leakage</div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="custom-table" id="comparisonTable">
+      <thead>
+        <tr>
+          <th>Model Algorithm</th>
+          <th>Type / Role</th>
+          <th>R² Score</th>
+          <th>MAE ($)</th>
+          <th>RMSE ($)</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in metadata.model_comparisons %}
+        <tr class="{% if m.is_best %}table-active bg-light{% endif %}">
+          <td class="fw-bold">
+            {{ m.name }}
+            {% if m.is_best %}
+            <span class="badge bg-success ms-1"><i class="bi bi-check-lg"></i> Champion Model</span>
+            {% endif %}
+          </td>
+          <td class="text-muted small">
+            {% if 'Linear' in m.name %}Parametric Baseline{% elif 'Forest' in m.name %}Ensemble Bagging{% else %}Ensemble Boosting{% endif %}
+          </td>
+          <td><span class="fw-bold {% if m.is_best %}text-success fs-6{% endif %}">{{ m.r2 }}</span></td>
+          <td>${{ "{:,.0f}".format(m.mae) }}</td>
+          <td>${{ "{:,.0f}".format(m.rmse) }}</td>
+          <td>
+            {% if m.is_best %}
+            <span class="badge bg-success-subtle text-success border border-success-subtle">Active in Flask</span>
+            {% else %}
+            <span class="badge bg-light text-muted border">Candidate</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="text-center py-3 text-muted">No model comparison metrics available.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Actual vs. Predicted & Residual Error Charts Grid -->
+<div class="row g-4">
+  <!-- Chart: Actual vs Predicted -->
+  <div class="col-lg-6">
+    <div class="app-card h-100">
+      <div class="app-card-header">
+        <div>
+          <h3 class="app-card-title"><i class="bi bi-bullseye text-primary"></i> Actual vs. Predicted Price</h3>
+          <div class="app-card-subtitle">Closer to 45° reference line indicates higher prediction accuracy</div>
+        </div>
+      </div>
+      <div style="height: 320px; position: relative;">
+        <canvas id="actualVsPredChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart: Residual Distribution -->
+  <div class="col-lg-6">
+    <div class="app-card h-100">
+      <div class="app-card-header">
+        <div>
+          <h3 class="app-card-title"><i class="bi bi-graph-down text-danger"></i> Residual Error Distribution</h3>
+          <div class="app-card-subtitle">Histogram of prediction errors ($y - \hat{y}$) across validation test set</div>
+        </div>
+      </div>
+      <div style="height: 320px; position: relative;">
+        <canvas id="residualChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart: Feature Importance -->
+  <div class="col-12">
+    <div class="app-card">
+      <div class="app-card-header">
+        <div>
+          <h3 class="app-card-title"><i class="bi bi-bar-chart-fill text-teal"></i> Feature Importance / Contribution Weights</h3>
+          <div class="app-card-subtitle" id="featureImportanceSubtitle">
+            Native Gini / Variance Reduction importance extracted from the trained model pipeline
+          </div>
+        </div>
+      </div>
+      <div style="height: 360px; position: relative;">
+        <canvas id="featureImportanceChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Methodology & Educational Documentation Cards -->
+<div class="row g-4 mt-1">
+  <div class="col-md-4">
+    <div class="p-3 bg-white border rounded shadow-sm h-100">
+      <h5 class="fw-bold mb-2 text-dark"><i class="bi bi-shield-lock-fill text-primary me-2"></i> Data Leakage Prevention</h5>
+      <p class="small text-muted mb-0">
+        All preprocessing transformations (StandardScaler for numerical metrics and OneHotEncoder for zipcodes) are bound into a strictly encapsulated scikit-learn Pipeline. Preprocessors are fitted exclusively on the 80% training set and evaluated on the untouched 20% test partition.
+      </p>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="p-3 bg-white border rounded shadow-sm h-100">
+      <h5 class="fw-bold mb-2 text-dark"><i class="bi bi-percent text-success me-2"></i> R² and Error Metrics</h5>
+      <p class="small text-muted mb-0">
+        R² (Coefficient of Determination) measures the proportion of market price variance explained by the model features. MAE represents the average dollar deviation. RMSE applies quadratic penalty to outliers, reflecting risk of large discrepancies.
+      </p>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="p-3 bg-white border rounded shadow-sm h-100">
+      <h5 class="fw-bold mb-2 text-dark"><i class="bi bi-bounding-box text-warning me-2"></i> Defensible Prediction Interval</h5>
+      <p class="small text-muted mb-0">
+        Uncertainty bounds are calculated using an empirical 90% prediction interval based on the held-out test RMSE ($\pm 1.645 \times \text{RMSE}$). HomeValue AI avoids fabricated confidence percentages and adheres to transparent statistical error limits.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/model_performance.js') }}"></script>
+{% endblock %}

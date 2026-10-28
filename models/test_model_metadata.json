@@ -1,0 +1,551 @@
+{
+  "active_model_name": "Linear Regression (Baseline)",
+  "active_model_type": "LinearRegression",
+  "trained_at": "2026-10-09T16:04:20.974125",
+  "dataset_name": "kc_house_data.csv",
+  "dataset_path": "C:\\Users\\DELL\\OneDrive\\Desktop\\Python Projects\\Project1\\data\\kc_house_data.csv",
+  "dataset_total_rows": 197,
+  "train_samples": 157,
+  "test_samples": 40,
+  "features_used": [
+    "sqft_living",
+    "sqft_lot",
+    "bedrooms",
+    "bathrooms",
+    "floors",
+    "waterfront",
+    "view",
+    "condition",
+    "grade",
+    "sqft_above",
+    "sqft_basement",
+    "yr_built",
+    "zipcode"
+  ],
+  "numerical_features": [
+    "sqft_living",
+    "sqft_lot",
+    "bedrooms",
+    "bathrooms",
+    "floors",
+    "waterfront",
+    "view",
+    "condition",
+    "grade",
+    "sqft_above",
+    "sqft_basement",
+    "yr_built"
+  ],
+  "categorical_features": [
+    "zipcode"
+  ],
+  "metrics": {
+    "mae": 160086.9,
+    "mse": 140012335670.1,
+    "rmse": 374182.22,
+    "r2": -0.4265,
+    "mape": 26.09
+  },
+  "model_comparisons": [
+    {
+      "name": "Linear Regression (Baseline)",
+      "short_name": "LinearRegression",
+      "r2": -0.4265,
+      "mae": 160086.9,
+      "rmse": 374182.22,
+      "mse": 140012335670.1,
+      "mape": 26.09,
+      "is_best": true
+    },
+    {
+      "name": "Random Forest Regressor",
+      "short_name": "RandomForest",
+      "r2": 0.875,
+      "mae": 77161.79,
+      "rmse": 110771.71,
+      "mse": 12270372412.91,
+      "mape": 18.03,
+      "is_best": false
+    },
+    {
+      "name": "Gradient Boosting Regressor",
+      "short_name": "GradientBoosting",
+      "r2": 0.886,
+      "mae": 73377.55,
+      "rmse": 105773.55,
+      "mse": 11188044525.94,
+      "mape": 16.07,
+      "is_best": false
+    }
+  ],
+  "feature_importance": [
+    {
+      "feature": "Zip 98116",
+      "raw_feature": "zipcode_98116",
+      "importance": 12.96,
+      "technique": "Standardized Absolute Linear Regression Coefficients"
+    },
+    {
+      "feature": "Zip 98004",
+      "raw_feature": "zipcode_98004",
+      "importance": 10.51,
+      "technique": "Standardized Absolute Linear Regression Coefficients"
+    },
+    {
+      "feature": "Zip 98166",
+      "raw_feature": "zipcode_98166",
+      "importance": 7.8,
+      "technique": "Standardized Absolute Linear Regression Coefficients"
+    },
+    {
+      "feature": "Zip 98119",
+      "raw_feature": "zipcode_98119",
+      "importance": 5.1,
+      "technique": "Standardized Absolute Linear Regression Coefficients"
+    },
+    {
+      "feature": "Zip 98029",
+      "raw_feature": "zipcode_98029",
+      "importance": 4.07,
+      "technique": "Standardized Absolute Linear Regression Coefficients"
+    },
+    {
+      "feature": "Zip 98126",
+      "raw_feature": "zipcode_98126",
+      "importance": 3.76,
+      "technique": "Standardized Absolute Linear Regression Coefficients"
+    },
+    {
+      "feature": "Zip 98002",
+      "raw_feature": "zipcode_98002",
+      "importance": 3.45,
+      "technique": "Standardized Absolute Linear Regression Coefficients"
+    },
+    {
+      "feature": "view",
+      "raw_feature": "view",
+      "importance": 3.32,
+      "technique": "Standardized Absolute Linear Regression Coefficients"
+    },
+    {
+      "feature": "Zip 98092",
+      "raw_feature": "zipcode_98092",
+      "importance": 2.99,
+      "technique": "Standardized Absolute Linear Regression Coefficients"
+    },
+    {
+      "feature": "Zip 98040",
+      "raw_feature": "zipcode_98040",
+      "importance": 2.87,
+      "technique": "Standardized Absolute Linear Regression Coefficients"
+    },
+    {
+      "feature": "Zip 98136",
+      "raw_feature": "zipcode_98136",
+      "importance": 2.33,
+      "technique": "Standardized Absolute Linear Regression Coefficients"
+    },
+    {
+      "feature": "Zip 98117",
+      "raw_feature": "zipcode_98117",
+      "importance": 2.22,
+      "technique": "Standardized Absolute Linear Regression Coefficients"
+    }
+  ],
+  "residual_summary": {
+    "histogram": [
+      {
+        "bin_label": "$-1499k to $-1331k",
+        "bin_start": -1499933.0,
+        "bin_end": -1331950.0,
+        "count": 2
+      },
+      {
+        "bin_label": "$-1331k to $-1163k",
+        "bin_start": -1331950.0,
+        "bin_end": -1163966.0,
+        "count": 0
+      },
+      {
+        "bin_label": "$-1163k to $-995k",
+        "bin_start": -1163966.0,
+        "bin_end": -995983.0,
+        "count": 1
+      },
+      {
+        "bin_label": "$-995k to $-827k",
+        "bin_start": -995983.0,
+        "bin_end": -827999.0,
+        "count": 0
+      },
+      {
+        "bin_label": "$-827k to $-660k",
+        "bin_start": -827999.0,
+        "bin_end": -660016.0,
+        "count": 0
+      },
+      {
+        "bin_label": "$-660k to $-492k",
+        "bin_start": -660016.0,
+        "bin_end": -492032.0,
+        "count": 0
+      },
+      {
+        "bin_label": "$-492k to $-324k",
+        "bin_start": -492032.0,
+        "bin_end": -324048.0,
+        "count": 0
+      },
+      {
+        "bin_label": "$-324k to $-156k",
+        "bin_start": -324048.0,
+        "bin_end": -156065.0,
+        "count": 3
+      },
+      {
+        "bin_label": "$-156k to $11k",
+        "bin_start": -156065.0,
+        "bin_end": 11919.0,
+        "count": 19
+      },
+      {
+        "bin_label": "$11k to $179k",
+        "bin_start": 11919.0,
+        "bin_end": 179902.0,
+        "count": 15
+      }
+    ],
+    "scatter_sample": [
+      {
+        "actual": 395000.0,
+        "predicted": 371194.0,
+        "error": 23806.0
+      },
+      {
+        "actual": 565000.0,
+        "predicted": 426595.0,
+        "error": 138405.0
+      },
+      {
+        "actual": 395000.0,
+        "predicted": 435957.0,
+        "error": -40957.0
+      },
+      {
+        "actual": 449900.0,
+        "predicted": 611967.0,
+        "error": -162067.0
+      },
+      {
+        "actual": 745000.0,
+        "predicted": 737731.0,
+        "error": 7269.0
+      },
+      {
+        "actual": 538000.0,
+        "predicted": 535503.0,
+        "error": 2497.0
+      },
+      {
+        "actual": 410000.0,
+        "predicted": 698641.0,
+        "error": -288641.0
+      },
+      {
+        "actual": 950000.0,
+        "predicted": 770098.0,
+        "error": 179902.0
+      },
+      {
+        "actual": 189000.0,
+        "predicted": 163719.0,
+        "error": 25281.0
+      },
+      {
+        "actual": 510000.0,
+        "predicted": 523183.0,
+        "error": -13183.0
+      },
+      {
+        "actual": 550000.0,
+        "predicted": 583187.0,
+        "error": -33187.0
+      },
+      {
+        "actual": 650000.0,
+        "predicted": 1999201.0,
+        "error": -1349201.0
+      },
+      {
+        "actual": 495000.0,
+        "predicted": 486171.0,
+        "error": 8829.0
+      },
+      {
+        "actual": 700000.0,
+        "predicted": 524430.0,
+        "error": 175570.0
+      },
+      {
+        "actual": 499950.0,
+        "predicted": 545774.0,
+        "error": -45824.0
+      },
+      {
+        "actual": 320000.0,
+        "predicted": 297068.0,
+        "error": 22932.0
+      },
+      {
+        "actual": 455000.0,
+        "predicted": 459057.0,
+        "error": -4057.0
+      },
+      {
+        "actual": 323000.0,
+        "predicted": 411726.0,
+        "error": -88726.0
+      },
+      {
+        "actual": 572000.0,
+        "predicted": 682684.0,
+        "error": -110684.0
+      },
+      {
+        "actual": 1630000.0,
+        "predicted": 1533799.0,
+        "error": 96201.0
+      },
+      {
+        "actual": 670000.0,
+        "predicted": 684943.0,
+        "error": -14943.0
+      },
+      {
+        "actual": 510000.0,
+        "predicted": 502025.0,
+        "error": 7975.0
+      },
+      {
+        "actual": 720000.0,
+        "predicted": 730221.0,
+        "error": -10221.0
+      },
+      {
+        "actual": 750000.0,
+        "predicted": 2249933.0,
+        "error": -1499933.0
+      },
+      {
+        "actual": 249000.0,
+        "predicted": 305245.0,
+        "error": -56245.0
+      },
+      {
+        "actual": 275000.0,
+        "predicted": 343874.0,
+        "error": -68874.0
+      },
+      {
+        "actual": 695000.0,
+        "predicted": 624152.0,
+        "error": 70848.0
+      },
+      {
+        "actual": 1520000.0,
+        "predicted": 1461263.0,
+        "error": 58737.0
+      },
+      {
+        "actual": 580500.0,
+        "predicted": 466528.0,
+        "error": 113972.0
+      },
+      {
+        "actual": 390000.0,
+        "predicted": 258514.0,
+        "error": 131486.0
+      },
+      {
+        "actual": 475000.0,
+        "predicted": 521174.0,
+        "error": -46174.0
+      },
+      {
+        "actual": 252000.0,
+        "predicted": 246116.0,
+        "error": 5884.0
+      },
+      {
+        "actual": 448000.0,
+        "predicted": 444992.0,
+        "error": 3008.0
+      },
+      {
+        "actual": 329000.0,
+        "predicted": 522998.0,
+        "error": -193998.0
+      },
+      {
+        "actual": 480000.0,
+        "predicted": 461934.0,
+        "error": 18066.0
+      },
+      {
+        "actual": 585000.0,
+        "predicted": 563291.0,
+        "error": 21709.0
+      },
+      {
+        "actual": 1325000.0,
+        "predicted": 2417049.0,
+        "error": -1092049.0
+      },
+      {
+        "actual": 230000.0,
+        "predicted": 217517.0,
+        "error": 12483.0
+      },
+      {
+        "actual": 440000.0,
+        "predicted": 427193.0,
+        "error": 12807.0
+      },
+      {
+        "actual": 247000.0,
+        "predicted": 393845.0,
+        "error": -146845.0
+      }
+    ],
+    "stats": {
+      "min_residual": -1499933.27,
+      "max_residual": 179902.27,
+      "mean_residual": -103203.61,
+      "std_residual": 359668.39
+    }
+  },
+  "supported_zipcodes": [
+    "98001",
+    "98002",
+    "98003",
+    "98004",
+    "98006",
+    "98007",
+    "98008",
+    "98010",
+    "98014",
+    "98019",
+    "98022",
+    "98023",
+    "98027",
+    "98028",
+    "98029",
+    "98030",
+    "98033",
+    "98034",
+    "98038",
+    "98040",
+    "98042",
+    "98052",
+    "98053",
+    "98055",
+    "98056",
+    "98058",
+    "98059",
+    "98065",
+    "98074",
+    "98092",
+    "98103",
+    "98106",
+    "98107",
+    "98112",
+    "98115",
+    "98116",
+    "98117",
+    "98119",
+    "98125",
+    "98126",
+    "98133",
+    "98136",
+    "98146",
+    "98166",
+    "98168",
+    "98178",
+    "98198",
+    "98199"
+  ],
+  "summary_ranges": {
+    "sqft_living": {
+      "min": 770.0,
+      "max": 5420.0,
+      "median": 1960.0,
+      "mean": 2177.8426395939086
+    },
+    "sqft_lot": {
+      "min": 1245.0,
+      "max": 101930.0,
+      "median": 6012.0,
+      "mean": 7967.213197969543
+    },
+    "bedrooms": {
+      "min": 1.0,
+      "max": 5.0,
+      "median": 3.0,
+      "mean": 3.416243654822335
+    },
+    "bathrooms": {
+      "min": 1.0,
+      "max": 4.5,
+      "median": 2.25,
+      "mean": 2.16751269035533
+    },
+    "floors": {
+      "min": 1.0,
+      "max": 3.0,
+      "median": 1.5,
+      "mean": 1.4898477157360406
+    },
+    "waterfront": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.005076142131979695
+    },
+    "view": {
+      "min": 0.0,
+      "max": 4.0,
+      "median": 0.0,
+      "mean": 0.14213197969543148
+    },
+    "condition": {
+      "min": 3.0,
+      "max": 5.0,
+      "median": 3.0,
+      "mean": 3.416243654822335
+    },
+    "grade": {
+      "min": 6.0,
+      "max": 11.0,
+      "median": 8.0,
+      "mean": 7.888324873096447
+    },
+    "sqft_above": {
+      "min": 770.0,
+      "max": 4580.0,
+      "median": 1570.0,
+      "mean": 1877.6395939086294
+    },
+    "sqft_basement": {
+      "min": 0.0,
+      "max": 1700.0,
+      "median": 0.0,
+      "mean": 300.20304568527916
+    },
+    "yr_built": {
+      "min": 1900.0,
+      "max": 2014.0,
+      "median": 1963.0,
+      "mean": 1968.4111675126903
+    }
+  }
+}

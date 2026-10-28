@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block title %}Predict House Price — HomeValue AI{% endblock %}
+{% block page_title %}Predict House Price{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <!-- Left Column: Property Input Form -->
+  <div class="col-lg-7">
+    <div class="app-card position-relative" id="predictFormCard">
+      <!-- Loading Spinner Backdrop -->
+      <div class="spinner-backdrop" id="predictSpinner">
+        <div class="spinner-border text-primary mb-2" style="width: 3rem; height: 3rem;" role="status"></div>
+        <div class="fw-bold text-dark">Running ML Valuation Pipeline...</div>
+        <div class="small text-muted">Preprocessing features & evaluating model ensemble</div>
+      </div>
+
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <div>
+          <h2 class="app-card-title mb-0"><i class="bi bi-magic text-primary"></i> Property Valuation Form</h2>
+          <div class="app-card-subtitle">Enter property specs to run inference against our trained pipeline</div>
+        </div>
+        <!-- Quick Preset Buttons -->
+        <div class="d-flex flex-wrap gap-1 mt-2 mt-sm-0">
+          <span class="small text-muted align-self-center me-1">Presets:</span>
+          <button type="button" class="preset-btn" onclick="applyPreset('starter')">Starter Home</button>
+          <button type="button" class="preset-btn" onclick="applyPreset('suburban')">Suburban Family</button>
+          <button type="button" class="preset-btn" onclick="applyPreset('luxury')">Luxury Waterfront</button>
+          <button type="button" class="preset-btn" onclick="applyPreset('craftsman')">Seattle Craftsman</button>
+        </div>
+      </div>
+
+      <form id="predictionForm" novalidate>
+        <!-- Location Details -->
+        <div class="form-section-title">
+          <i class="bi bi-geo-alt-fill text-danger"></i> Location Details
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="zipcode" class="form-label">
+              King County Postal ZIP Code <span class="text-danger">*</span>
+            </label>
+            <select class="form-select" id="zipcode" name="zipcode" required>
+              {% for zc in zipcodes %}
+              <option value="{{ zc }}" {% if zc == '98103' %}selected{% endif %}>{{ zc }}</option>
+              {% else %}
+              <option value="98103" selected>98103 (Seattle Green Lake)</option>
+              <option value="98004">98004 (Bellevue West)</option>
+              <option value="98052">98052 (Redmond)</option>
+              <option value="98033">98033 (Kirkland)</option>
+              <option value="98115">98115 (Seattle Northeast)</option>
+              <option value="98117">98117 (Seattle Ballard)</option>
+              <option value="98040">98040 (Mercer Island)</option>
+              <option value="98006">98006 (Bellevue South)</option>
+              <option value="98027">98027 (Issaquah)</option>
+              <option value="98178">98178 (Seattle Bryn Mawr)</option>
+              {% endfor %}
+            </select>
+            <div class="input-hint">Mapped directly to training geographic encoding.</div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="property_title" class="form-label">Property Title / Identifier (Optional)</label>
+            <input type="text" class="form-control" id="property_title" name="property_title" placeholder="e.g. Maple Leaf Craftsman Home" value="Craftsman Family Residence">
+            <div class="input-hint">Custom label saved to your prediction history record.</div>
+          </div>
+        </div>
+
+        <!-- Property Core Specs -->
+        <div class="form-section-title">
+          <i class="bi bi-house-door-fill text-primary"></i> Primary Dimensions & Space
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="sqft_living" class="form-label">
+              Living Interior Space (sq ft) <span class="text-danger">*</span>
+            </label>
+            <input type="number" class="form-control" id="sqft_living" name="sqft_living" min="300" max="25000" step="10" value="2150" required>
+            <div class="input-hint">Interior heated living area (typical: 800 – 6,000 sq ft).</div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="sqft_lot" class="form-label">Total Land Lot Area (sq ft)</label>
+            <input type="number" class="form-control" id="sqft_lot" name="sqft_lot" min="400" max="500000" step="50" value="6500">
+            <div class="input-hint">Land parcel size (1 acre = 43,560 sq ft).</div>
+          </div>
+
+          <div class="col-md-4">
+            <label for="bedrooms" class="form-label">Bedrooms <span class="text-danger">*</span></label>
+            <select class="form-select" id="bedrooms" name="bedrooms" required>
+              <option value="1">1 Bedroom</option>
+              <option value="2">2 Bedrooms</option>
+              <option value="3" selected>3 Bedrooms</option>
+              <option value="4">4 Bedrooms</option>
+              <option value="5">5 Bedrooms</option>
+              <option value="6">6+ Bedrooms</option>
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label for="bathrooms" class="form-label">Bathrooms <span class="text-danger">*</span></label>
+            <select class="form-select" id="bathrooms" name="bathrooms" required>
+              <option value="1.0">1.0 Bath</option>
+              <option value="1.5">1.5 Baths</option>
+              <option value="2.0" selected>2.0 Baths</option>
+              <option value="2.5">2.5 Baths</option>
+              <option value="3.0">3.0 Baths</option>
+              <option value="3.5">3.5 Baths</option>
+              <option value="4.0">4.0+ Baths</option>
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label for="floors" class="form-label">Number of Floors</label>
+            <select class="form-select" id="floors" name="floors">
+              <option value="1.0">1.0 (Ranch / Single story)</option>
+              <option value="1.5">1.5 (Story with dormers)</option>
+              <option value="2.0" selected>2.0 (Two story)</option>
+              <option value="2.5">2.5 Stories</option>
+              <option value="3.0">3.0 (Three story townhouse)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Structural Quality & Construction -->
+        <div class="form-section-title">
+          <i class="bi bi-hammer text-warning"></i> Construction Quality & Features
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="grade" class="form-label">
+              Construction Grade (1–13)
+              <i class="bi bi-question-circle text-muted" data-bs-toggle="tooltip" title="King County appraisal grade based on construction design and workmanship quality."></i>
+            </label>
+            <select class="form-select" id="grade" name="grade">
+              <option value="5">Grade 5 (Low / Basic cabin)</option>
+              <option value="6">Grade 6 (Economy construction)</option>
+              <option value="7" selected>Grade 7 (Standard average builder grade)</option>
+              <option value="8">Grade 8 (Good quality finishes)</option>
+              <option value="9">Grade 9 (Better custom architect design)</option>
+              <option value="10">Grade 10 (High quality luxury finishes)</option>
+              <option value="11">Grade 11 (Very high luxury custom estate)</option>
+              <option value="12">Grade 12 (Mansion caliber)</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="condition" class="form-label">Maintenance Condition (1–5)</label>
+            <select class="form-select" id="condition" name="condition">
+              <option value="1">1 (Poor - Heavy repairs required)</option>
+              <option value="2">2 (Fair - Deferred maintenance)</option>
+              <option value="3" selected>3 (Average maintenance)</option>
+              <option value="4">4 (Good - Well kept)</option>
+              <option value="5">5 (Very Good / Excellent upkeep)</option>
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label for="yr_built" class="form-label">Year Built</label>
+            <input type="number" class="form-control" id="yr_built" name="yr_built" min="1900" max="2026" value="1998">
+          </div>
+
+          <div class="col-md-4">
+            <label for="sqft_basement" class="form-label">Basement Area (sq ft)</label>
+            <input type="number" class="form-control" id="sqft_basement" name="sqft_basement" min="0" max="6000" step="50" value="0">
+            <div class="input-hint">0 if slab or crawlspace.</div>
+          </div>
+
+          <div class="col-md-4">
+            <label for="view" class="form-label">Scenic View Rating</label>
+            <select class="form-select" id="view" name="view">
+              <option value="0" selected>0 (No scenic view)</option>
+              <option value="1">1 (Minor / Partial view)</option>
+              <option value="2">2 (Fair outlook)</option>
+              <option value="3">3 (Good view)</option>
+              <option value="4">4 (Spectacular panoramic view)</option>
+            </select>
+          </div>
+
+          <div class="col-12 mt-3">
+            <div class="form-check form-switch p-2 border rounded bg-light">
+              <input class="form-check-input ms-0 me-3" type="checkbox" id="waterfront" name="waterfront" value="1">
+              <label class="form-check-label fw-bold text-dark" for="waterfront">
+                <i class="bi bi-water text-primary me-1"></i> Direct Waterfront Property (Lake Washington, Puget Sound, or River)
+              </label>
+              <div class="small text-muted ms-5">Properties with direct shoreline access command substantial market premiums.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 mt-4 pt-3 border-top">
+          <button type="submit" class="btn-primary-custom flex-grow-1 justify-content-center py-2" id="predictSubmitBtn">
+            <i class="bi bi-calculator-fill"></i>
+            <span>Calculate House Valuation</span>
+          </button>
+          <button type="button" class="btn-secondary-custom px-3" onclick="resetForm()">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Right Column: Live Property Summary & Prediction Result -->
+  <div class="col-lg-5">
+    <!-- Live Summary / Valuation Output Card -->
+    <div class="valuation-result-box" id="valuationResultBox">
+      <!-- Pre-calculation State -->
+      <div id="preValuationState">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+            <i class="bi bi-cpu me-1"></i> Inference Ready
+          </span>
+          <span class="small text-muted" id="activeModelLabel">Model: Active Pipeline</span>
+        </div>
+
+        <h3 class="fs-4 fw-bold text-white mb-2" id="livePropertyTitle">Craftsman Family Residence</h3>
+        <p class="text-secondary small mb-3" id="liveLocationSubtitle">King County, Washington (ZIP 98103)</p>
+
+        <!-- Live Specs Chips -->
+        <div class="mb-4">
+          <div class="spec-chip"><i class="bi bi-arrows-angle"></i> <span id="chipSqft">2,150</span> sq ft</div>
+          <div class="spec-chip"><i class="bi bi-door-closed"></i> <span id="chipBeds">3</span> Beds</div>
+          <div class="spec-chip"><i class="bi bi-droplet"></i> <span id="chipBaths">2.0</span> Baths</div>
+          <div class="spec-chip"><i class="bi bi-layers"></i> <span id="chipFloors">2.0</span> Floors</div>
+          <div class="spec-chip"><i class="bi bi-award"></i> Grade <span id="chipGrade">7</span>/13</div>
+          <div class="spec-chip"><i class="bi bi-calendar"></i> Built <span id="chipBuilt">1998</span></div>
+        </div>
+
+        <div class="p-3 rounded border border-secondary border-opacity-25 bg-black bg-opacity-25 mb-4 text-center">
+          <div class="text-muted small mb-1">Click below to predict market value</div>
+          <div class="fs-2 fw-bold text-secondary">$ --,---</div>
+          <div class="small text-muted">Awaiting input submission</div>
+        </div>
+
+        <div class="small text-muted">
+          <i class="bi bi-info-circle me-1"></i> Preprocessing applies Standard Scaling to numeric features and One-Hot Encoding to zipcodes with zero data leakage.
+        </div>
+      </div>
+
+      <!-- Post-calculation Result State (Hidden by default) -->
+      <div id="postValuationState" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+            <i class="bi bi-check-circle-fill me-1"></i> Valuation Generated
+          </span>
+          <span class="small text-secondary" id="resultTimestamp">Just now</span>
+        </div>
+
+        <div class="small text-uppercase tracking-wide text-secondary fw-semibold">Estimated Market Value</div>
+        <div class="price-display-hero" id="resultHeroPrice">$645,000</div>
+        
+        <div class="price-range-text mb-3">
+          <i class="bi bi-arrows-expand me-1"></i> Defensible Range: 
+          <strong class="text-white" id="resultPriceRange">$585,000 – $705,000</strong>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <div class="spec-chip bg-dark border-secondary">
+            <i class="bi bi-tag"></i> <span id="resultPricePerSqft">$300</span> / sq ft
+          </div>
+          <div class="spec-chip bg-dark border-secondary">
+            <i class="bi bi-shield-check text-success"></i> Model R²: <span id="resultModelR2">0.88</span>
+          </div>
+          <div class="spec-chip bg-dark border-secondary">
+            <i class="bi bi-percent text-info"></i> MAE: <span id="resultModelMae">$58,000</span>
+          </div>
+        </div>
+
+        <!-- Key Valuation Drivers Section -->
+        <div class="mt-3 pt-3 border-top border-secondary border-opacity-25">
+          <div class="small fw-bold text-uppercase text-secondary mb-2">
+            <i class="bi bi-lightbulb-fill text-warning me-1"></i> Key Valuation Drivers
+          </div>
+          <div id="valuationDriversList" class="small text-light">
+            <!-- Injected by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Uncertainty Methodology Note -->
+        <div class="mt-3 p-2 rounded bg-black bg-opacity-40 border border-secondary border-opacity-25 small text-secondary">
+          <i class="bi bi-info-circle text-info me-1"></i>
+          <span id="uncertaintyMethodText">90% empirical prediction interval calculated via model held-out test RMSE.</span>
+        </div>
+
+        <!-- Result Action Buttons -->
+        <div class="d-flex gap-2 mt-4">
+          <button type="button" class="btn btn-sm btn-outline-light flex-grow-1" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i> Print / PDF
+          </button>
+          <a href="{{ url_for('prediction.history_page') }}" class="btn btn-sm btn-outline-info flex-grow-1 text-center">
+            <i class="bi bi-clock-history me-1"></i> View in History
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/prediction.js') }}"></script>
+{% endblock %}

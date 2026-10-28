@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Overview — HomeValue AI{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<div class="welcome-banner">
+  <div class="row align-items-center">
+    <div class="col-lg-8">
+      <h1 class="welcome-title">Understand Your Home's Value</h1>
+      <p class="welcome-subtitle">
+        AI-powered property valuation using machine learning. Estimate residential market values with calibrated regression models, defensible prediction intervals, and deep market analytics.
+      </p>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{{ url_for('prediction.predict_page') }}" class="btn-primary-custom">
+          <i class="bi bi-magic"></i>
+          <span>Predict House Price</span>
+        </a>
+        <a href="{{ url_for('analytics.analytics_page') }}" class="btn-secondary-custom">
+          <i class="bi bi-graph-up"></i>
+          <span>Explore Analytics</span>
+        </a>
+      </div>
+    </div>
+    <div class="col-lg-4 text-center text-lg-end d-none d-lg-block">
+      <div style="font-size: 5rem; opacity: 0.85; color: #A5B4FC;">
+        <i class="bi bi-houses"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Summary KPI Cards -->
+<div class="row g-3" id="kpiRow">
+  <!-- Total Predictions -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper kpi-icon-indigo">
+        <i class="bi bi-calculator"></i>
+      </div>
+      <div>
+        <div class="kpi-label">Total Predictions</div>
+        <div class="kpi-value" id="kpiTotalPredictions">--</div>
+        <div class="kpi-subtext" id="kpiTotalSubtext">In SQLite History</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Average Predicted Price -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper kpi-icon-teal">
+        <i class="bi bi-tag"></i>
+      </div>
+      <div>
+        <div class="kpi-label">Average Predicted Price</div>
+        <div class="kpi-value" id="kpiAvgPrice">--</div>
+        <div class="kpi-subtext">Across user requests</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Highest Predicted Price -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper kpi-icon-amber">
+        <i class="bi bi-trophy"></i>
+      </div>
+      <div>
+        <div class="kpi-label">Highest Predicted Price</div>
+        <div class="kpi-value" id="kpiMaxPrice">--</div>
+        <div class="kpi-subtext">Peak valuation recorded</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Current Model R2 Score -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper kpi-icon-emerald">
+        <i class="bi bi-shield-check"></i>
+      </div>
+      <div>
+        <div class="kpi-label">Current Model R² Score</div>
+        <div class="kpi-value" id="kpiModelR2">--</div>
+        <div class="kpi-subtext" id="kpiModelName">Held-out test benchmark</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 4 Charts Grid -->
+<div class="row g-3">
+  <!-- Chart 1: Price Distribution -->
+  <div class="col-lg-6">
+    <div class="app-card h-100">
+      <div class="app-card-header">
+        <div>
+          <h2 class="app-card-title"><i class="bi bi-bar-chart-fill text-primary"></i> Price Distribution Histogram</h2>
+          <div class="app-card-subtitle">Market distribution across property pricing tiers</div>
+        </div>
+      </div>
+      <div style="height: 280px; position: relative;">
+        <canvas id="priceDistChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 2: Average Price by Bedrooms -->
+  <div class="col-lg-6">
+    <div class="app-card h-100">
+      <div class="app-card-header">
+        <div>
+          <h2 class="app-card-title"><i class="bi bi-building text-success"></i> Average Price by Bedrooms</h2>
+          <div class="app-card-subtitle">Mean valuation grouped by number of bedroom suites</div>
+        </div>
+      </div>
+      <div style="height: 280px; position: relative;">
+        <canvas id="bedroomPriceChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 3: Living Area vs Price Scatter -->
+  <div class="col-lg-6">
+    <div class="app-card h-100">
+      <div class="app-card-header">
+        <div>
+          <h2 class="app-card-title"><i class="bi bi-aspect-ratio-fill text-info"></i> Area vs. Predicted Price</h2>
+          <div class="app-card-subtitle">Living area (sq ft) correlation with property market price</div>
+        </div>
+      </div>
+      <div style="height: 280px; position: relative;">
+        <canvas id="areaPriceScatterChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 4: Recent Prediction Activity -->
+  <div class="col-lg-6">
+    <div class="app-card h-100">
+      <div class="app-card-header">
+        <div>
+          <h2 class="app-card-title"><i class="bi bi-activity text-warning"></i> Recent Prediction Activity</h2>
+          <div class="app-card-subtitle">Valuation requests executed over time</div>
+        </div>
+      </div>
+      <div style="height: 280px; position: relative;">
+        <canvas id="activityChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Predictions Table -->
+<div class="app-card mt-3">
+  <div class="app-card-header">
+    <div>
+      <h2 class="app-card-title"><i class="bi bi-clock-history text-primary"></i> Recent Property Valuations</h2>
+      <div class="app-card-subtitle">Real records recorded into the SQLite database</div>
+    </div>
+    <a href="{{ url_for('prediction.history_page') }}" class="btn btn-sm btn-outline-secondary">
+      View All History <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Date & Time</th>
+          <th>Property / Location</th>
+          <th>Living Area</th>
+          <th>Beds / Baths</th>
+          <th>Estimated Price</th>
+          <th>Model</th>
+          <th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody id="recentPredictionsBody">
+        <tr>
+          <td colspan="7" class="text-center py-4 text-muted">
+            <div class="spinner-border spinner-border-sm text-primary me-2"></div> Loading recent predictions...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Prediction Detail Modal -->
+<div class="modal fade" id="quickDetailModal" tabindex="-1" aria-labelledby="quickDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title" id="quickDetailModalLabel"><i class="bi bi-info-circle me-2"></i> Valuation Record Details</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4" id="quickDetailModalBody">
+        <!-- Injected via JavaScript -->
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

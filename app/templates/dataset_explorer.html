@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Dataset Explorer — HomeValue AI{% endblock %}
+{% block page_title %}Dataset Explorer & Schema Inspector{% endblock %}
+
+{% block content %}
+<!-- Upload & Action Bar -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="app-card h-100">
+      <div class="app-card-header">
+        <div>
+          <h2 class="app-card-title"><i class="bi bi-cloud-arrow-up-fill text-primary"></i> Upload Custom Housing CSV</h2>
+          <div class="app-card-subtitle">Upload your custom dataset to inspect columns and retrain the ML model</div>
+        </div>
+      </div>
+
+      <form id="datasetUploadForm" enctype="multipart/form-data">
+        <div class="mb-3">
+          <label for="csvFileInput" class="form-label">Select CSV File (Max 32MB)</label>
+          <input class="form-control" type="file" id="csvFileInput" name="file" accept=".csv" required>
+          <div class="input-hint">Must contain standard housing fields: <code>bedrooms</code>, <code>bathrooms</code>, <code>sqft_living</code>, and a price target.</div>
+        </div>
+
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="setActiveCheckbox" name="set_active" value="true" checked>
+          <label class="form-check-label small" for="setActiveCheckbox">
+            Set as active production dataset for training
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary-custom w-100 justify-content-center" id="uploadBtn">
+          <i class="bi bi-upload"></i> Upload & Inspect Schema
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Retraining Card -->
+  <div class="col-lg-6">
+    <div class="app-card h-100">
+      <div class="app-card-header">
+        <div>
+          <h2 class="app-card-title"><i class="bi bi-gear-wide-connected text-teal"></i> Model Retraining Control</h2>
+          <div class="app-card-subtitle">Train a fresh pipeline on the active dataset with automatic algorithm selection</div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="algorithmSelect" class="form-label">Training Algorithm</label>
+        <select class="form-select" id="algorithmSelect">
+          <option value="auto" selected>Auto-Select Best Performing (Recommended)</option>
+          <option value="RandomForest">Random Forest Regressor (Ensemble Bagging)</option>
+          <option value="GradientBoosting">Gradient Boosting Regressor (Ensemble Boosting)</option>
+          <option value="LinearRegression">Linear Regression (Parametric Baseline)</option>
+        </select>
+        <div class="input-hint">Auto mode evaluates all 3 models on a held-out 20% test split and deploys the champion.</div>
+      </div>
+
+      <div class="alert alert-warning d-flex align-items-center gap-2 mb-3">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <div class="small">
+          Retraining replaces the currently deployed pipeline in memory. A confirmation dialog will appear before retraining starts.
+        </div>
+      </div>
+
+      <button type="button" class="btn-teal-custom w-100 justify-content-center" id="openRetrainModalBtn">
+        <i class="bi bi-play-circle-fill"></i> Initiate Model Retraining
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Dataset Summary Cards -->
+<div class="row g-3 mb-4" id="datasetSummaryCards">
+  <div class="col-sm-6 col-lg-3">
+    <div class="kpi-card mb-0">
+      <div class="kpi-icon-wrapper kpi-icon-indigo"><i class="bi bi-table"></i></div>
+      <div>
+        <div class="kpi-label">Total Rows</div>
+        <div class="kpi-value" id="dsRowCount">--</div>
+        <div class="kpi-subtext" id="dsFileName">Active Dataset</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="kpi-card mb-0">
+      <div class="kpi-icon-wrapper kpi-icon-teal"><i class="bi bi-columns-gap"></i></div>
+      <div>
+        <div class="kpi-label">Columns</div>
+        <div class="kpi-value" id="dsColCount">--</div>
+        <div class="kpi-subtext">Features & Target</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="kpi-card mb-0">
+      <div class="kpi-icon-wrapper kpi-icon-amber"><i class="bi bi-copy"></i></div>
+      <div>
+        <div class="kpi-label">Duplicates</div>
+        <div class="kpi-value" id="dsDupCount">--</div>
+        <div class="kpi-subtext">Identical property sales</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="kpi-card mb-0">
+      <div class="kpi-icon-wrapper kpi-icon-emerald"><i class="bi bi-check-all"></i></div>
+      <div>
+        <div class="kpi-label">Schema Status</div>
+        <div class="kpi-value fs-5" id="dsCompatStatus">Validating...</div>
+        <div class="kpi-subtext">ML Compatibility</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Schema & Column Profiling Table -->
+<div class="app-card mb-4">
+  <div class="app-card-header">
+    <div>
+      <h3 class="app-card-title"><i class="bi bi-file-earmark-code text-primary"></i> Column Profile & Data Types</h3>
+      <div class="app-card-subtitle">Data type inference, missing value detection, and descriptive statistics</div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="custom-table" id="columnsProfileTable">
+      <thead>
+        <tr>
+          <th>Column Name</th>
+          <th>Data Type</th>
+          <th>Missing Values (%)</th>
+          <th>Min / Max</th>
+          <th>Mean / Median</th>
+          <th>Pipeline Role</th>
+        </tr>
+      </thead>
+      <tbody id="columnsProfileBody">
+        <tr>
+          <td colspan="6" class="text-center py-4">
+            <div class="spinner-border spinner-border-sm text-primary me-2"></div> Profiling dataset columns...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- First 8 Rows Preview Table -->
+<div class="app-card">
+  <div class="app-card-header">
+    <div>
+      <h3 class="app-card-title"><i class="bi bi-eye-fill text-info"></i> Dataset Records Preview</h3>
+      <div class="app-card-subtitle">Inspection preview of initial records from the dataset</div>
+    </div>
+  </div>
+
+  <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+    <table class="table table-sm table-hover table-bordered small" id="previewTable">
+      <thead class="table-light" id="previewHead">
+        <!-- Injected via JS -->
+      </thead>
+      <tbody id="previewBody">
+        <!-- Injected via JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Retrain Confirmation Modal -->
+<div class="modal fade" id="retrainConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title"><i class="bi bi-exclamation-octagon-fill text-warning me-2"></i> Confirm Model Retraining</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <p class="mb-3">
+          You are about to trigger machine learning pipeline retraining.
+        </p>
+        <ul class="small text-muted mb-3">
+          <li>Dataset will be split 80% train / 20% test with a fixed random seed.</li>
+          <li>All candidate models will be evaluated on the held-out test split.</li>
+          <li>The active production pipeline will be updated in memory upon completion.</li>
+        </ul>
+        <div class="p-3 bg-light rounded border text-center">
+          <span class="fw-bold">Algorithm Selection:</span> <span id="confirmAlgorithmLabel" class="text-primary fw-bold">Auto-Select Best</span>
+        </div>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="startTrainingNowBtn">
+          <i class="bi bi-check-circle me-1"></i> Start Retraining
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dataset_explorer.js') }}"></script>
+{% endblock %}
